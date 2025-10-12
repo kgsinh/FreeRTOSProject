@@ -1,0 +1,80 @@
+!SESSION 2025-04-20 12:07:14.549 -----------------------------------------------
+eclipse.buildId=Version 1.17.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-20 12:08:05.406
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-20 12:08:05.407
+!MESSAGE Log4j2 initialized with config file D:\Workspace\FreeRTOS\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-20 12:08:09.058
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-04-20 12:10:34.769 -----------------------------------------------
+eclipse.buildId=Version 1.17.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Framework arguments:  D:\Workspace\FreeRTOS\.cproject
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 D:\Workspace\FreeRTOS\.cproject
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-20 12:10:49.522
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-20 12:10:49.522
+!MESSAGE Log4j2 initialized with config file D:\Workspace\FreeRTOS\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-20 12:10:52.297
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-04-20 12:11:14.593 -----------------------------------------------
+eclipse.buildId=Version 1.17.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Framework arguments:  D:\Workspace\FreeRTOS\.project
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 D:\Workspace\FreeRTOS\.project
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-20 12:11:20.347
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-20 12:11:20.348
+!MESSAGE Log4j2 initialized with config file D:\Workspace\FreeRTOS\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-20 12:11:22.749
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.core.jobs 2 2 2025-04-20 12:11:40.518
+!MESSAGE Job found still running after platform shutdown.  Jobs should be canceled by the plugin that scheduled them during shutdown: org.eclipse.ui.internal.Workbench$39
+!SESSION 2025-04-20 13:06:28.332 -----------------------------------------------
+eclipse.buildId=Version 1.17.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data D:\Workspace\FreeRTOS
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-20 13:06:32.508
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-20 13:06:32.510
+!MESSAGE Log4j2 initialized with config file D:\Workspace\FreeRTOS\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-20 13:06:35.024
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2025-04-20 13:07:30.433 -----------------------------------------------
+eclipse.buildId=Version 1.17.0
+java.version=21.0.3
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_CA
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data file:/D:/Workspace/FreeRTOS/
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2025-04-20 13:07:34.419
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2025-04-20 13:07:34.420
+!MESSAGE Log4j2 initialized with config file D:\Workspace\FreeRTOS\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2025-04-20 13:07:36.849
+!MESSAGE Started RMI Server, listening on port 41337
