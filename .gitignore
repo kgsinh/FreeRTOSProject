@@ -1,3 +1,25 @@
+# STM32CubeIDE / Eclipse
+.metadata/
+.settings/
+*.launch
+*.cproject
+*.project
+*.mxproject
+
+# Build output
+Debug/
+Release/
+*.o
+*.elf
+*.bin
+*.map
+*.lst
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
 # Prerequisites
 *.d
 
