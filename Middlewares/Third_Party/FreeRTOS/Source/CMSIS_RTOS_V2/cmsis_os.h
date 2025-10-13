@@ -125,6 +125,8 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
+#include "queue.h"
 
 #define RTOS_ID_n             ((tskKERNEL_VERSION_MAJOR << 16) | (tskKERNEL_VERSION_MINOR))
 #define RTOS_ID_s             ("FreeRTOS " tskKERNEL_VERSION_NUMBER)

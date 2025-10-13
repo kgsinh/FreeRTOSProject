@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include "main.h"
 #include "cmsis_os.h"
+#include "led.h"
+#include "button.h"
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
@@ -13,9 +15,12 @@ static void MX_USART2_UART_Init(void);
 
 
 int __io_putchar(int ch);
+void vGreenLedControllerTask(void *pvParameters);
 void vBlueLedControllerTask(void *pvParameters);
 void vRedLedControllerTask(void *pvParameters);
-void vGreenLedControllerTask(void *pvParameters);
+void vButtonControllerTask(void *pvParameters);
+//void vPatternGeneratorTask(void *pvParameters);
+//void vMonitorTask(void *pvParameters);
 
 typedef uint32_t TaskProfiler;
 
@@ -30,28 +35,51 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  led_gpio_init();
+  button_gpio_init();
   MX_USART2_UART_Init();
+
+  xTaskCreate(vGreenLedControllerTask,
+		  	  "Green Led",
+			  100,
+			  NULL,
+			  4,
+			  NULL);
 
   xTaskCreate(vBlueLedControllerTask,
 		  	  "Blue Led",
 			  100,
 			  NULL,
-			  1,
+			  4,
 			  NULL);
 
   xTaskCreate(vRedLedControllerTask,
-		  	  "Red Led",
-			  100,
-			  NULL,
-			  1,
-			  NULL);
-
-  xTaskCreate(vGreenLedControllerTask,
- 		  	  "Green Led",
+ 		  	  "Red Led",
  			  100,
  			  NULL,
- 			  1,
+ 			  4,
  			  NULL);
+
+  xTaskCreate(vButtonControllerTask,
+		  	  "Button Controller",
+			  100,
+			  NULL,
+			  3,
+			  NULL);
+
+//  xTaskCreate(vPatternGeneratorTask,
+//		  	  "Pattern Generator",
+//			  100,
+//			  NULL,
+//			  2,
+//			  NULL);
+//
+//  xTaskCreate(vMonitorTask,
+//		  	  "Monitor Task",
+//			  100,
+//			  NULL,
+//			  1,
+//			  NULL);
 
 
   vTaskStartScheduler();
@@ -63,12 +91,29 @@ int main(void)
 
 }
 
+void vGreenLedControllerTask(void *pvParameters)
+{
+	while(1)
+	{
+		GreenTaskProfiler++;
+	//	printf("vBlueLedControllerTask running...\n\r");
+		led_on(10);
+		vTaskDelay(500);
+		led_off(10);
+		vTaskDelay(500);
+	}
+}
+
 void vBlueLedControllerTask(void *pvParameters)
 {
 	while(1)
 	{
 		BlueTaskProfiler++;
-	//	printf("vBlueLedControllerTask running...\n\r");
+	//	printf("vRedLedControllerTask running...\n\r");
+		led_on(11);
+		vTaskDelay(1000);
+		led_off(11);
+		vTaskDelay(1000);
 	}
 }
 
@@ -77,16 +122,26 @@ void vRedLedControllerTask(void *pvParameters)
 	while(1)
 	{
 		RedTaskProfiler++;
-	//	printf("vRedLedControllerTask running...\n\r");
+	//	printf("vGreenLedControllerTask running...\n\r");
+		led_on(12);
+		vTaskDelay(2000);
+		led_off(12);
+		vTaskDelay(2000);
 	}
 }
 
-void vGreenLedControllerTask(void *pvParameters)
+void vButtonControllerTask(void *pvParameters)
 {
 	while(1)
 	{
-		GreenTaskProfiler++;
-	//	printf("vGreenLedControllerTask running...\n\r");
+	//	printf("vButtonControllerTask running...\n\r");
+		if(is_button_pressed())
+		{
+			led_off(10);
+			led_off(11);
+			led_off(12);
+		}
+		vTaskDelay(100);
 	}
 }
 
