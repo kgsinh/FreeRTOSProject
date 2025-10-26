@@ -48,10 +48,10 @@ It’s a compact example of real-world embedded RTOS design — timing, task iso
       | (Reads from Queue)   |
       +----------------------+
                   |
-   +--------------+--------------+
+   +--------------+-----------------+
    | Green LED | Blue LED | Red LED |
    |   Task    |   Task   |   Task  |
-   +--------------+--------------+
+   +--------------+-----------------+
 
 
 ---
