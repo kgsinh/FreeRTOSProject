@@ -50,7 +50,7 @@ It’s a compact example of real-world embedded RTOS design — timing, task iso
                   |
    +--------------+--------------+
    | Green LED | Blue LED | Red LED |
-   |   Task     |   Task   |   Task  |
+   |   Task    |   Task   |   Task  |
    +--------------+--------------+
 
 
@@ -64,7 +64,6 @@ It’s a compact example of real-world embedded RTOS design — timing, task iso
 ✅ **vTaskDelayUntil()** – precise periodic scheduling  
 ✅ **Task suspend/resume** – isolate LED control during patterns  
 ✅ **PWM integration** – link hardware timers to FreeRTOS  
-✅ **Debouncing** – handled using `xTaskGetTickCountFromISR()`  
 
 ---
 
