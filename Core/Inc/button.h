@@ -15,8 +15,13 @@
 #include "cmsis_os.h"
 #include "stm32g0xx_hal.h"
 #include "stm32g071xx.h"
+#include "led.h"
+#include "pwm.h"
+
+extern TaskHandle_t xButtonTaskHandle;
 
 void button_gpio_init(void);
+void button_enable_interrupt(void);
 uint8_t is_button_pressed(void);
 
 

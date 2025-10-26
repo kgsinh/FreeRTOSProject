@@ -13,7 +13,6 @@
 
 #include "main.h"
 #include "cmsis_os.h"
-#include "stm32g0xx_hal.h"
 #include "stm32g071xx.h"
 
 void led_gpio_init(void);

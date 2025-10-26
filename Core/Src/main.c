@@ -3,6 +3,8 @@
 #include "cmsis_os.h"
 #include "led.h"
 #include "button.h"
+#include "pwm.h"
+
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
@@ -25,6 +27,8 @@ void vButtonControllerTask(void *pvParameters);
 typedef uint32_t TaskProfiler;
 
 TaskProfiler BlueTaskProfiler, RedTaskProfiler,GreenTaskProfiler;
+TaskHandle_t xBlueTaskHandle, xRedTaskHandle, xGreenTaskHandle;
+
 int main(void)
 {
 
@@ -35,37 +39,43 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART2_UART_Init();
   led_gpio_init();
   button_gpio_init();
-  MX_USART2_UART_Init();
+  pwm_init();
+  set_pwm_duty_cycle(70); // Set initial duty cycle to 50%
+  set_pwm_brightness(500); // Set initial brightness to 50%
 
   xTaskCreate(vGreenLedControllerTask,
 		  	  "Green Led",
-			  100,
+			  128,
 			  NULL,
-			  4,
-			  NULL);
+			  2,
+			  &xGreenTaskHandle);
 
   xTaskCreate(vBlueLedControllerTask,
-		  	  "Blue Led",
-			  100,
+		  	  "PWM Blue Led",
+			  128,
 			  NULL,
-			  4,
-			  NULL);
+			  2,
+			  &xBlueTaskHandle);
 
   xTaskCreate(vRedLedControllerTask,
  		  	  "Red Led",
- 			  100,
+ 			  128,
  			  NULL,
- 			  4,
- 			  NULL);
+ 			  2,
+ 			  &xRedTaskHandle);
 
-  xTaskCreate(vButtonControllerTask,
+  if(xTaskCreate(vButtonControllerTask,
 		  	  "Button Controller",
-			  100,
+			  256,
 			  NULL,
-			  3,
-			  NULL);
+			  4,
+			  &xButtonTaskHandle)!= pdPASS)
+  {
+	  printf("Button Controller task creation failed.\n\r");
+  }
 
 //  xTaskCreate(vPatternGeneratorTask,
 //		  	  "Pattern Generator",
@@ -81,8 +91,9 @@ int main(void)
 //			  1,
 //			  NULL);
 
-
+  button_enable_interrupt();
   vTaskStartScheduler();
+
 
   while (1)
   {
@@ -96,7 +107,7 @@ void vGreenLedControllerTask(void *pvParameters)
 	while(1)
 	{
 		GreenTaskProfiler++;
-	//	printf("vBlueLedControllerTask running...\n\r");
+
 		led_on(10);
 		vTaskDelay(500);
 		led_off(10);
@@ -109,11 +120,9 @@ void vBlueLedControllerTask(void *pvParameters)
 	while(1)
 	{
 		BlueTaskProfiler++;
-	//	printf("vRedLedControllerTask running...\n\r");
-		led_on(11);
-		vTaskDelay(1000);
-		led_off(11);
-		vTaskDelay(1000);
+
+		pwm_fade();
+		vTaskDelay(100);
 	}
 }
 
@@ -122,7 +131,7 @@ void vRedLedControllerTask(void *pvParameters)
 	while(1)
 	{
 		RedTaskProfiler++;
-	//	printf("vGreenLedControllerTask running...\n\r");
+
 		led_on(12);
 		vTaskDelay(2000);
 		led_off(12);
@@ -132,17 +141,37 @@ void vRedLedControllerTask(void *pvParameters)
 
 void vButtonControllerTask(void *pvParameters)
 {
-	while(1)
-	{
-	//	printf("vButtonControllerTask running...\n\r");
-		if(is_button_pressed())
-		{
-			led_off(10);
-			led_off(11);
-			led_off(12);
-		}
-		vTaskDelay(100);
-	}
+    printf("=== BUTTON TASK STARTED ===\n\r");
+
+    // Heartbeat to prove task is running
+    uint32_t counter = 0;
+
+    while(1)
+    {
+        // Wait with timeout to show task is alive
+        uint32_t notification = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5000)); // 5 second timeout
+
+        if(notification > 0)
+        {
+            printf("*** BUTTON NOTIFICATION RECEIVED ***\n\r");
+
+            vTaskDelay(pdMS_TO_TICKS(50));
+
+            led_off(10);
+            set_pwm_duty_cycle(0);
+            led_off(12);
+            vTaskSuspend(xGreenTaskHandle);
+            vTaskSuspend(xBlueTaskHandle);
+            vTaskSuspend(xRedTaskHandle);
+
+            printf("LEDs turned off by button\n\r");
+        }
+        else
+        {
+            // Timeout - show task is alive
+            printf("Button task alive, counter: %lu\n\r", ++counter);
+        }
+    }
 }
 
 int __io_putchar(int ch)
