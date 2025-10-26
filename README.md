@@ -23,7 +23,7 @@ It’s a compact example of real-world embedded RTOS design — timing, task iso
 
 | Task | Purpose | Priority | RTOS Concept |
 |------|----------|-----------|---------------|
-| **Green LED Task** | Blink LED1 at 1Hz | 2 | Periodic timing using `vTaskDelayUntil()` |
+| **Green LED Task** | Blink LED1  | 2 | Periodic timing using `vTaskDelayUntil()` |
 | **Blue LED Task** | PWM fading control | 2 | Task timing and CPU sharing |
 | **Red LED Task** | Blink LED3 | 2 | Cooperative multitasking |
 | **Button Task** | Detect button press via ISR notification | 3 | ISR → Task communication |
@@ -49,10 +49,10 @@ It’s a compact example of real-world embedded RTOS design — timing, task iso
       | (Reads from Queue)   |
       +----------------------+
                   |
-   +--------------+-----------------+
-   | Green LED | Blue LED | Red LED |
-   |   Task    |   Task   |   Task  |
-   +--------------+-----------------+
+    +--------------------------------------+
+    | Green LED | Blue LED (PWM) | Red LED |
+    |   Task    |   Task         |  Task   |
+    +--------------------------------------+
 
 
 ---
