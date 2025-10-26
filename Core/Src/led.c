@@ -8,12 +8,9 @@ void led_gpio_init(void)
 	// Configure PC10, PC11, PC12 as output
 	GPIOC->MODER &= ~(3U << (2*10));  // Clear mode bits for PC10
 	GPIOC->MODER |= (1U << (2*10));   // PC10 output mode
-//	GPIOC->MODER &= ~(3U << (2*11));  // Clear mode bits for PC11
-//	GPIOC->MODER |= (1U << (2*11));   // PC11 output mode
 	GPIOC->MODER &= ~(3U << (2*12));  // Clear mode bits for PC12
 	GPIOC->MODER |= (1U << (2*12));   // PC12 output mode
 	GPIOC->OSPEEDR |= (3U << (2*10)); // PC10 high speed
-//	GPIOC->OSPEEDR |= (3U << (2*11)); // PC11 high speed
 	GPIOC->OSPEEDR |= (3U << (2*12)); // PC12 high speed
 }
 

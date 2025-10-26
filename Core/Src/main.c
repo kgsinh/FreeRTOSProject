@@ -21,13 +21,13 @@ void vGreenLedControllerTask(void *pvParameters);
 void vBlueLedControllerTask(void *pvParameters);
 void vRedLedControllerTask(void *pvParameters);
 void vButtonControllerTask(void *pvParameters);
-//void vPatternGeneratorTask(void *pvParameters);
-//void vMonitorTask(void *pvParameters);
+void vPatternGeneratorTask(void *pvParameters);
 
 typedef uint32_t TaskProfiler;
 
 TaskProfiler BlueTaskProfiler, RedTaskProfiler,GreenTaskProfiler;
 TaskHandle_t xBlueTaskHandle, xRedTaskHandle, xGreenTaskHandle;
+QueueHandle_t xPatternQueue;
 
 int main(void)
 {
@@ -45,6 +45,13 @@ int main(void)
   pwm_init();
   set_pwm_duty_cycle(70); // Set initial duty cycle to 50%
   set_pwm_brightness(500); // Set initial brightness to 50%
+
+  xPatternQueue = xQueueCreate(5, sizeof(uint8_t));
+  if(xPatternQueue == NULL)
+  {
+	  printf("Failed to create pattern queue.\n\r");
+	  while(1);
+  }
 
   xTaskCreate(vGreenLedControllerTask,
 		  	  "Green Led",
@@ -71,35 +78,26 @@ int main(void)
 		  	  "Button Controller",
 			  256,
 			  NULL,
-			  4,
+			  3,
 			  &xButtonTaskHandle)!= pdPASS)
   {
 	  printf("Button Controller task creation failed.\n\r");
   }
 
-//  xTaskCreate(vPatternGeneratorTask,
-//		  	  "Pattern Generator",
-//			  100,
-//			  NULL,
-//			  2,
-//			  NULL);
-//
-//  xTaskCreate(vMonitorTask,
-//		  	  "Monitor Task",
-//			  100,
-//			  NULL,
-//			  1,
-//			  NULL);
+  xTaskCreate(vPatternGeneratorTask,
+		  	  "Pattern Generator",
+			  256,
+			  NULL,
+			  1,
+			  NULL);
 
   button_enable_interrupt();
   vTaskStartScheduler();
-
 
   while (1)
   {
 
   }
-
 }
 
 void vGreenLedControllerTask(void *pvParameters)
@@ -107,7 +105,6 @@ void vGreenLedControllerTask(void *pvParameters)
 	while(1)
 	{
 		GreenTaskProfiler++;
-
 		led_on(10);
 		vTaskDelay(500);
 		led_off(10);
@@ -120,9 +117,9 @@ void vBlueLedControllerTask(void *pvParameters)
 	while(1)
 	{
 		BlueTaskProfiler++;
-
 		pwm_fade();
 		vTaskDelay(100);
+
 	}
 }
 
@@ -133,9 +130,9 @@ void vRedLedControllerTask(void *pvParameters)
 		RedTaskProfiler++;
 
 		led_on(12);
-		vTaskDelay(2000);
+		vTaskDelay(500);
 		led_off(12);
-		vTaskDelay(2000);
+		vTaskDelay(500);
 	}
 }
 
@@ -143,35 +140,98 @@ void vButtonControllerTask(void *pvParameters)
 {
     printf("=== BUTTON TASK STARTED ===\n\r");
 
-    // Heartbeat to prove task is running
-    uint32_t counter = 0;
-
     while(1)
     {
+    	static uint8_t pattern = 0;
         // Wait with timeout to show task is alive
         uint32_t notification = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5000)); // 5 second timeout
 
         if(notification > 0)
         {
-            printf("*** BUTTON NOTIFICATION RECEIVED ***\n\r");
-
-            vTaskDelay(pdMS_TO_TICKS(50));
-
-            led_off(10);
-            set_pwm_duty_cycle(0);
-            led_off(12);
-            vTaskSuspend(xGreenTaskHandle);
-            vTaskSuspend(xBlueTaskHandle);
-            vTaskSuspend(xRedTaskHandle);
-
-            printf("LEDs turned off by button\n\r");
-        }
-        else
-        {
-            // Timeout - show task is alive
-            printf("Button task alive, counter: %lu\n\r", ++counter);
+            pattern = (pattern + 1) % 3; // Cycle through patterns 0, 1, 2
+            xQueueSend(xPatternQueue, &pattern, portMAX_DELAY);
+            printf("Pattern %u sent to Pattern Generator Task\n\r", pattern);
         }
     }
+}
+
+void vPatternGeneratorTask(void *pvParameters)
+{
+	uint8_t receivedPattern;
+
+	while(1)
+	{
+		// Wait indefinitely for a pattern from the queue
+		if(xQueueReceive(xPatternQueue, &receivedPattern, portMAX_DELAY) == pdPASS)
+		{
+			printf("Pattern Generator Task received pattern: %u\n\r", receivedPattern);
+
+			// Suspend normal LED tasks during pattern execution
+			vTaskSuspend(xGreenTaskHandle);
+			vTaskSuspend(xBlueTaskHandle);
+			vTaskSuspend(xRedTaskHandle);
+			led_off(10); // Ensure Green LED is off
+			led_off(12); // Ensure Red LED is off
+			set_pwm_duty_cycle(0); // Ensure PWM is off
+
+			// Execute the received pattern
+			switch(receivedPattern)
+			{
+				case 0:
+					printf("Executing Pattern 0: Blink Green LED 3 times\n\r");
+					led_off(11); // Ensure Blue LED is off
+					set_pwm_duty_cycle(0); // Ensure PWM is off
+					for(int i = 0; i < 3; i++)
+					{
+						led_on(10);
+						vTaskDelay(300);
+						led_off(10);
+						vTaskDelay(300);
+					}
+					break;
+
+				case 1:
+					printf("Executing Pattern 1: Fade Blue LED in and out\n\r");
+					led_off(10); // Ensure Green LED is off
+					led_off(12); // Ensure Red LED is off
+					for(int duty = 0; duty <= 100; duty += 10)
+					{
+						set_pwm_duty_cycle(duty);
+						vTaskDelay(200);
+					}
+					for(int duty = 100; duty >= 0; duty -= 10)
+					{
+						set_pwm_duty_cycle(duty);
+						vTaskDelay(200);
+					}
+					set_pwm_duty_cycle(0); // Turn off after fading
+					break;
+
+				case 2:
+					printf("Executing Pattern 2: Blink Red LED 5 times\n\r");
+					led_off(10); // Ensure Green LED is off
+					set_pwm_duty_cycle(0); // Ensure PWM is off
+					for(int i = 0; i < 5; i++)
+					{
+						led_on(12);
+						vTaskDelay(200);
+						led_off(12);
+						vTaskDelay(200);
+					}
+					break;
+
+				default:
+					printf("Unknown pattern received: %u\n\r", receivedPattern);
+					break;
+			}
+
+			// Resume normal LED tasks after pattern execution
+			vTaskResume(xGreenTaskHandle);
+			vTaskResume(xBlueTaskHandle);
+			vTaskResume(xRedTaskHandle);
+			printf("Resumed LED controller tasks after pattern execution\n\r");
+		}
+	}
 }
 
 int __io_putchar(int ch)
