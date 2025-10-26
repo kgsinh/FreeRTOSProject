@@ -41,20 +41,14 @@ uint8_t is_button_pressed(void)
 
 void EXTI4_15_IRQHandler(void)
 {
-
-
 	if(EXTI->FPR1 & (1U << 13)) // Check if EXTI13 triggered the interrupt
 	{
 		EXTI->FPR1 |= (1U << 13); // Clear the pending interrupt flag by writing 1
 
-		 printf("Button ISR: Handle = 0x%08lX\n\r", (uint32_t)xButtonTaskHandle);
-
 		if(xButtonTaskHandle != NULL)
 		{
 		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
 		vTaskNotifyGiveFromISR(xButtonTaskHandle, &xHigherPriorityTaskWoken);
-		printf("Notification sent, yield=%lu\n\r", xHigherPriorityTaskWoken);
 		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 		}
 		else

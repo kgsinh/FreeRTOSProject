@@ -5,7 +5,6 @@
 #include "button.h"
 #include "pwm.h"
 
-
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 
@@ -13,8 +12,6 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
-
-
 
 int __io_putchar(int ch);
 void vGreenLedControllerTask(void *pvParameters);
@@ -47,11 +44,6 @@ int main(void)
   set_pwm_brightness(500); // Set initial brightness to 50%
 
   xPatternQueue = xQueueCreate(5, sizeof(uint8_t));
-  if(xPatternQueue == NULL)
-  {
-	  printf("Failed to create pattern queue.\n\r");
-	  while(1);
-  }
 
   xTaskCreate(vGreenLedControllerTask,
 		  	  "Green Led",
@@ -74,15 +66,12 @@ int main(void)
  			  2,
  			  &xRedTaskHandle);
 
-  if(xTaskCreate(vButtonControllerTask,
+  xTaskCreate(vButtonControllerTask,
 		  	  "Button Controller",
 			  256,
 			  NULL,
 			  3,
-			  &xButtonTaskHandle)!= pdPASS)
-  {
-	  printf("Button Controller task creation failed.\n\r");
-  }
+			  &xButtonTaskHandle);
 
   xTaskCreate(vPatternGeneratorTask,
 		  	  "Pattern Generator",
@@ -102,57 +91,47 @@ int main(void)
 
 void vGreenLedControllerTask(void *pvParameters)
 {
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	const TickType_t xFrequency = pdMS_TO_TICKS(500);
+
 	while(1)
 	{
 		GreenTaskProfiler++;
 		led_on(10);
-		vTaskDelay(500);
+		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		led_off(10);
-		vTaskDelay(500);
+		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	}
 }
 
 void vBlueLedControllerTask(void *pvParameters)
 {
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	const TickType_t xFrequency = pdMS_TO_TICKS(100);
+
 	while(1)
 	{
 		BlueTaskProfiler++;
 		pwm_fade();
-		vTaskDelay(100);
+		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 
 	}
 }
 
 void vRedLedControllerTask(void *pvParameters)
 {
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	const TickType_t xFrequency = pdMS_TO_TICKS(500);
+
 	while(1)
 	{
 		RedTaskProfiler++;
 
 		led_on(12);
-		vTaskDelay(500);
+		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		led_off(12);
-		vTaskDelay(500);
+		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 	}
-}
-
-void vButtonControllerTask(void *pvParameters)
-{
-    printf("=== BUTTON TASK STARTED ===\n\r");
-
-    while(1)
-    {
-    	static uint8_t pattern = 0;
-        // Wait with timeout to show task is alive
-        uint32_t notification = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5000)); // 5 second timeout
-
-        if(notification > 0)
-        {
-            pattern = (pattern + 1) % 3; // Cycle through patterns 0, 1, 2
-            xQueueSend(xPatternQueue, &pattern, portMAX_DELAY);
-            printf("Pattern %u sent to Pattern Generator Task\n\r", pattern);
-        }
-    }
 }
 
 void vPatternGeneratorTask(void *pvParameters)
@@ -194,12 +173,12 @@ void vPatternGeneratorTask(void *pvParameters)
 					printf("Executing Pattern 1: Fade Blue LED in and out\n\r");
 					led_off(10); // Ensure Green LED is off
 					led_off(12); // Ensure Red LED is off
-					for(int duty = 0; duty <= 100; duty += 10)
+					for(int duty = 0; duty <= 100; duty += 20)
 					{
 						set_pwm_duty_cycle(duty);
 						vTaskDelay(200);
 					}
-					for(int duty = 100; duty >= 0; duty -= 10)
+					for(int duty = 100; duty >= 0; duty -= 20)
 					{
 						set_pwm_duty_cycle(duty);
 						vTaskDelay(200);
@@ -232,6 +211,25 @@ void vPatternGeneratorTask(void *pvParameters)
 			printf("Resumed LED controller tasks after pattern execution\n\r");
 		}
 	}
+}
+
+void vButtonControllerTask(void *pvParameters)
+{
+    printf("=== BUTTON TASK STARTED ===\n\r");
+
+    while(1)
+    {
+    	static uint8_t pattern = 0;
+        // Wait with timeout to show task is alive
+        uint32_t notification = ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(5000)); // 5 second timeout
+
+        if(notification > 0)
+        {
+            pattern = (pattern + 1) % 3; // Cycle through patterns 0, 1, 2
+            xQueueSend(xPatternQueue, &pattern, portMAX_DELAY);
+            printf("Pattern %u sent to Pattern Generator Task\n\r", pattern);
+        }
+    }
 }
 
 int __io_putchar(int ch)
