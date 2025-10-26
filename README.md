@@ -32,6 +32,7 @@ It’s a compact example of real-world embedded RTOS design — timing, task iso
 ---
 
 ## 🔄 Control Flow
+
       +----------------------+
       |  Button Interrupt    |
       +----------------------+
