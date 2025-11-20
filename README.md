@@ -254,7 +254,7 @@ void vGreenLedControllerTask(void *pvParameters)
 
 ### 2. Blue LED PWM Controller Task
 
-**Priority:** 2 | **Stack:** 128 words
+**Priority:** 2 | **Stack:** (128 words)
 
 ```c
 void vBlueLedControllerTask(void *pvParameters)
